@@ -1,9 +1,10 @@
-from numpy import *
-from numpy.linalg import inv
-from ManningCalcs import *
-from ChannelMassBal import *
+from numpy import reshape,empty,ones,any,concatenate,isinf
+from numpy.linalg import inv,cond
+#from ManningCalcs import *
+# from ChannelMassBal import *
+from calcnhat import calcnhat
 
-def CalcLklhd(h,A0,h0,S,n,w,L,t,sigS,sigh,sigq,dA,Delta,DeltaA,qhatv,Qvbar):
+def CalcLklhd(Obs,AllObs,A0,na,x1,D,Prior,Delta,DeltaA,B,qhatv,nOpt):
 
     # All vectors ordered "space-first"
     # theta(1)=theta(r1,t1)
@@ -12,83 +13,50 @@ def CalcLklhd(h,A0,h0,S,n,w,L,t,sigS,sigh,sigq,dA,Delta,DeltaA,qhatv,Qvbar):
     # theta(nt)=theta(r1,nt)
     # theta(nt+1)=theta(r2,t1)
 
+    # prep
+    M=D.nR * D.nt
+    N=D.nR *(D.nt-1)
 
-    [nR,nt]=h.shape
-    n=n*ones([nR,1])
-    hv=h.reshape(nR*nt,1)
-    dAv=dA.reshape(nR*nt,1)
-    nv=(n*ones([1,nt])).reshape(nR*nt,1)
-    wv=w.reshape(nR*nt,1)
-    Sv=S.reshape(nR*nt,1)
+    A0=A0.reshape(len(A0),1) #blech... surely there's a better way
     
-    A0v=(A0*ones([1,nt])).reshape(nR*nt,1)
-    h0v=(h0.T*ones([1,nt])).reshape(nR*nt,1)
+    A0v=(A0*ones([1,D.nt])).reshape(D.nR*D.nt,1) #seems silly...
+    
+    nhat=empty((D.nR,D.nt))
+    for r in range(0,D.nR):
+        nhat[r,:]=calcnhat(Obs.w[r,:],Obs.h[r,:],Obs.hmin[r],A0[r]+Obs.dA[r,:],x1[r],na[r],nOpt)
+    
+    nv=reshape(nhat.T,(M,1),order='F') #setting order to F makes it Matlab-equivalent I think
+    Qv=1/nv*(A0v+Obs.dAv)**(5/3)*Obs.wv**(-2/3)*Obs.Sv**(1/2)
+    
 
-    Q=ManningCalcs(A0.T,n,S,dA,w);
-    Qv=Q.reshape(nR*nt,1);
-
-    if (hv<0).any() | (A0v<0).any() | (Sv<0).any():
+    if (Obs.hv<0).any() | (A0v<0).any() | (Obs.Sv<0).any():
         f=0
         return
     
-    # Calculate dQdx, dQdt, and q for floodplain mass balance
+    #%%1) Calculate dQdx, dQdt, and q for channel mass balance
+    dQdxv=Delta @ Qv
+    dAdtv=(DeltaA @ Obs.hv) / D.dt * (B @ Obs.wv)    
+    
+    #%%2) Calculate covariance matrix of theta
+    #2.1) Calculate covariance matrix of dQdx
+    
+    TSv=Obs.Sv**(-1)
+    TdAv=1/(A0v+Obs.dAv)
+    Tw=Obs.wv**(-1)    
+    JS=0.5*Delta* (ones((N,1))@Qv.T)*(ones((N,1)) @ TSv.T)
+    JdA=5/3*Delta*(ones((N,1))@Qv.T)*(ones((N,1)) @ TdAv.T)
+    Jw=-2/3*Delta*(ones((N,1))@Qv.T)*(ones((N,1)) @ Tw.T)
+    
+    J=concatenate((JS,JdA,Jw),axis=1 )
+    CdQ=J @ Obs.CSdAw @ J.T
 
-    N=nR*(nt-1); # total number of "equations" / constraints
-    M=nR*nt;    
-
-#    [dQdx,dAdt]= FloodplainMassBal(h,t,L,Q,dA,F,Delta)
-    [dQdx,dAdt]= ChannelMassBal(h,t,L,Q,dA,Delta)
-    dQdxv=dQdx.reshape(N,1)
-
-    # Handle Jacobian of slope
-    TSv=Sv**(-1)
-    if isnan(Qvbar).any():
-        JS=0.5*Delta*(ones([N,1])*Qv.T)*(ones([N,1])*TSv.T)
+    Cf=Obs.CA + CdQ + Prior.Cqf #+CdQm
+    
+    Theta=dQdxv+dAdtv-Prior.Lats.qv
+    
+    if isinf(cond(Cf)):
+        f=0
     else:
-        JS=0.5*Delta*(ones([N,1])*Qvbar.T)*(ones([N,1])*TSv.T)    
-    Cs=sigS**2*eye(M,M,0,float)
-
-    # Handle Jacobian of height
-    Thv=wv/(A0v+dAv)
-    if isnan(Qvbar).any():
-        Jh=(5./3.)*Delta*(ones([N,1])*Qv.T)*(ones([N,1])*Thv.T)
-    else:
-        Jh=(5./3.)*Delta*(ones([N,1])*Qvbar.T)*(ones([N,1])*Thv.T)
-    Ch=sigh**2*eye(M,M,0,float);
-
-    J=concatenate((JS,Jh),axis=1)
-
-    Calpha=concatenate((concatenate((Cs,zeros([M,M],float)),axis=1),\
-                       concatenate((zeros([M,M],float),Ch),axis=1)))
-    Cq=dot(dot(J,Calpha),J.T)
-
-    # 
-    # for r=1:nR,
-    #     for j=1:nt-1,
-    #         t1=j; t2=j+1;
-    #         dt=(t(t2)-t(t1))*86400;
-    #         wbar=(w(r,t1)+w(r,t2))/2;
-    #         sig2c(r,j)=(wbar/dt)^2*2*sigh^2;
-    #     end
-    # end
-
-    dt=diff(t).T*86400*ones([1,nR]); dt=dt.reshape([nR*(nt-1),1])
-    JAh=(ones([N,1])*wv.T)*DeltaA/(dt*ones([1,M]))
-    CA=dot(dot(JAh,Ch),JAh.T)
-
-    # Cc=diag(reshape(sig2c',N,1));
-    Cqf=eye(N,N,0,float)*(sigq**2)
-
-    Cf=CA+Cq+Cqf
-    # Cf=CA+Cq;
-
-    dAdtv=dAdt.reshape([N,1])
-    # qv=reshape(q,N,1);
-    # Cf=diag(reshape(sig2f',N,1));
-
-    # f=mvnpdf(dQdxv+dAdtv-qhatv, [], Cf);
-    Theta=dQdxv+dAdtv-qhatv
-
-    f=(-0.5)*dot(dot(Theta.T,inv(Cf)),Theta)
+        f=-0.5*Theta.T @ inv(Cf) @ Theta
     
     return f

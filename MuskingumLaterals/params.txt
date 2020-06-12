@@ -1,0 +1,16 @@
+Chain length
+30000 
+Burn in
+6000 
+Random Number Seed 
+9 
+Initial and final time (first and last days) to use in estimate 
+1 20	
+Prior mean on mean discharge [m3/s] 
+500.000000	
+Prior coefficient of variation on mean flow [fraction... set to 0.5 for typical application 
+0.5	
+n version to use 
+4 
+Timestep of temporal data [day]
+1

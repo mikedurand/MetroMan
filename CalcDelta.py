@@ -1,5 +1,5 @@
 from numpy import empty,nan,zeros
-from GetABC import *
+from GetABC import GetABC
 
 def CalcDelta(nr,nt,L):
     Row=-1

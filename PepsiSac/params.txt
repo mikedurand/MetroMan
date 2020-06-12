@@ -1,0 +1,18 @@
+Chain length
+10000
+Burn in
+2000
+Random Number Seed
+9
+Number of times to use in estimate
+10 40
+Prior mean on mean discharge [m3/s]
+377
+Prior coefficient of variation on mean flow [fraction... set to 0.5 for typical application ]
+0.5
+Roughness coefficient option 
+4
+Timestep of temporal data [day]
+1
+Geomorph priors from Craig: loga_hat	loga_sigma	b_hat	b_sigma	logA0_hat	logA0_sigma
+-3.160721819	1.29348539	0.148108389	0.474298871	7.222566019	1.338002098
