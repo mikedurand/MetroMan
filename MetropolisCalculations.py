@@ -50,7 +50,11 @@ def MetropolisCalculations(Prior,D,Obs,jmp,C,R,DAll,AllObs,nOpt):
 
     pu1=lognorm.pdf(thetauA0,sigmaA0,0,exp(muA0))
     pu2=lognorm.pdf(thetauna,sigmana,0,exp(muna))
-    pu3=lognorm.pdf(-thetaux1,sigmax1,0,exp(mux1))
+    
+    if nOpt<5:
+        pu3=lognorm.pdf(-thetaux1,sigmax1,0,exp(mux1))
+    elif nOpt==5:
+        pu3=lognorm.pdf(thetaux1,sigmax1,0,exp(mux1))
     
     fu=CalcLklhd(Obs,AllObs,thetauA0,thetauna,thetaux1,D,Prior,Delta,DeltaA,B,thetauq,nOpt)
     
@@ -104,7 +108,11 @@ def MetropolisCalculations(Prior,D,Obs,jmp,C,R,DAll,AllObs,nOpt):
         #x1
         thetavx1=thetaux1+jmp.stdx1*R.z3[:,i]
         
-        pv3=lognorm.pdf(-thetavx1,sigmax1,0,exp(mux1))
+        if nOpt<5:
+            pv3=lognorm.pdf(-thetavx1,sigmax1,0,exp(mux1))
+        elif nOpt==5:
+            pv3=lognorm.pdf(thetavx1,sigmax1,0,exp(mux1))
+
         fv=CalcLklhd(Obs,AllObs,thetauA0,thetauna,thetavx1,D,Prior,Delta,DeltaA,B,thetauq,nOpt)
         
         if any(pv3==0):

@@ -22,6 +22,8 @@ def ProcessPrior(Prior,AllObs,DAll,Obs,D,ShowFigs,E):
     Obs.hmin=Obs.h.min(1)
     AllObs.hmin=AllObs.h.min(1)
     
+    A0u=ones((DAll.nR,1))*0.27*(Prior.meanQbar**.39)*7.2*(Prior.meanQbar**0.5) #Moody & Troutman A0    
+    
     #%% 2 friction coefficient
     meanx1=empty((D.nR,1))
     meanna=empty((D.nR,1))    
@@ -36,6 +38,12 @@ def ProcessPrior(Prior,AllObs,DAll,Obs,D,ShowFigs,E):
             covx1=1
             meanna[r]=0.04
             covna=.05
+        elif E.nOpt==5:
+            covd=0.3; #Moody and troutman
+            meanx1[r]=A0u[r]/mean(AllObs.w[r,:])*covd
+            covx1=0.5
+            meanna[r]=0.03
+            covna=0.05
 
        
     #%% 3 initial probability calculations
@@ -51,8 +59,7 @@ def ProcessPrior(Prior,AllObs,DAll,Obs,D,ShowFigs,E):
     #%%  chain setup
     N=int(1e4) 
     Nburn=int(N*.2)
-    
-    A0u=ones((DAll.nR,1))*0.27*(Prior.meanQbar**.39)*7.2*(Prior.meanQbar**0.5) #Moody & Troutman A0
+        
     for r in range(0,D.nR):
         if A0u[r]<allA0min[r]:
             A0u[r]=allA0min[r]+1
@@ -100,7 +107,7 @@ def ProcessPrior(Prior,AllObs,DAll,Obs,D,ShowFigs,E):
         
         jstdA0=A0u
         jstdna=nau
-        jstdx1=x1u
+        jstdx1=0.1*x1u
         
         jtarget=0.5
         
@@ -113,7 +120,10 @@ def ProcessPrior(Prior,AllObs,DAll,Obs,D,ShowFigs,E):
             pu1A=1
         pu1=1
         pu2=lognorm.pdf(nau,sigman[j],0,exp(mun[j]))
-        pu3=lognorm.pdf(-x1u,sigmax1[j],0,exp(mux1[j]) )
+        if E.nOpt<5:
+            pu3=lognorm.pdf(-x1u,sigmax1[j],0,exp(mux1[j]) )
+        elif E.nOpt==5:
+            pu3=lognorm.pdf(x1u,sigmax1[j],0,exp(mux1[j]) )
         
         nhatu = calcnhat(AllObs.w[j,:],AllObs.h[j,:],AllObs.hmin[j],A0u+AllObs.dA[j,:],x1u,nau,E.nOpt)
         
@@ -177,10 +187,17 @@ def ProcessPrior(Prior,AllObs,DAll,Obs,D,ShowFigs,E):
                 
             #x1
             x1v=x1u+z3[j,i]*jstdx1
-            if x1v >=0:
-                pv3=0
-            else:
-                pv3=lognorm.pdf(-x1v,sigmax1[j],0,exp(mux1[j]) )
+            if E.nOpt<5:
+                if x1v >=0:
+                    pv3=0
+                else:
+                    pv3=lognorm.pdf(-x1v,sigmax1[j],0,exp(mux1[j]) )
+            elif E.nOpt==5:
+                if x1v <0:
+                    pv3=0
+                else:
+                    pv3=lognorm.pdf(x1v,sigmax1[j],0,exp(mux1[j]) )
+                
             nhatv = calcnhat(AllObs.w[j,:],AllObs.h[j,:],AllObs.hmin[j],A0u+AllObs.dA[j,:],x1v,nau,E.nOpt)
             Qv=mean( 1/nhatv * (Au)**(5/3) * AllObs.w[j,:]**(-2/3)* AllObs.S[j,:]**0.5 ) 
             fv=lognorm.pdf(Qv,sigmaQbar,0,exp(muQbar) )

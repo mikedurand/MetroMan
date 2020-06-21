@@ -13,6 +13,8 @@ def calcnhat(w,h,hmin,A,x1,na,nOpt):
         nhat=na * (h-hmin+0.1)**x1
     elif nOpt==4:
         nhat=na * (A/w)**x1    
+    elif nOpt==5:
+        nhat=na * (1 + (x1/(A/w))**2 )**(5/6)
     
     return nhat
     
