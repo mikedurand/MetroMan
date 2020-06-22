@@ -12,5 +12,3 @@ Prior coefficient of variation on mean flow [fraction... set to 0.5 for typical 
 0.5
 Roughness coefficient option 
 4
-Timestep of temporal data [day]
-1

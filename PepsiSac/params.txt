@@ -11,6 +11,4 @@ Prior mean on mean discharge [m3/s]
 Prior coefficient of variation on mean flow [fraction... set to 0.5 for typical application ]
 0.5
 Roughness coefficient option 
-5
-Timestep of temporal data [day]
-1
+4
