@@ -154,7 +154,7 @@ def ProcessPrior(Prior,AllObs,DAll,Obs,D,ShowFigs,E):
             
             if MetRatio > u1[j,i]:
                 na1[j]=na1[j]+1
-                A0u=A0v; Qu=Qv; #argh - bug. Au should be updated to Av, too.
+                A0u=A0v; Au=Av; Qu=Qv; 
                 fu=fv; pu1=pv1; pu1A=pv1A;
             
             #na
