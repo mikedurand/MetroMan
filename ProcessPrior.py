@@ -234,11 +234,12 @@ def ProcessPrior(Prior,AllObs,DAll,Obs,D,ShowFigs,E):
         else:
             estA0min[i,:]=-min(Obs.dA[i,:] )
     #5.3 shift the "all" A0 into the estimate window
-    AllObs.A0Shift=AllObs.dA[:,E.tUse[0]] #different than the Matlab version... should be ok?
+    AllObs.A0Shift=AllObs.dA[:,E.iEst[0]] #different than the Matlab version... should be ok?
     
     #5.4 save the more restrictive limit
+    Amin=1; #this is the lowest value that we will let A0+dA take
     jmp=Jump()
-    jmp.A0min=maximum(allA0min.T+AllObs.A0Shift,estA0min.T)
+    jmp.A0min=maximum(allA0min.T+AllObs.A0Shift,estA0min.T)+Amin
     jmp.nmin=0.001
     
     #5.5 set up prior A0 variable by shifting into estimation window

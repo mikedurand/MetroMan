@@ -16,7 +16,7 @@ def ReadParams(fname,D):
     R.Seed=eval(infile[5])
     
     Exp=Experiment()
-    buf=infile[7]; buf=buf.split(); Exp.tUse=array(buf,int)
+    buf=infile[7]; buf=buf.split(); Exp.tUse=array(buf,float)
     
     P=Prior(D)
     P.meanQbar=eval(infile[9])

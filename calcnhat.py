@@ -5,7 +5,7 @@ Created on Wed Jun 10 10:07:09 2020
 
 @author: mtd
 """
-
+from numpy import any
 
 def calcnhat(w,h,hmin,A,x1,na,nOpt):
 

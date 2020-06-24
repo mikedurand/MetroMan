@@ -6,5 +6,5 @@ save_non_project_files = False
 
 [main]
 version = 0.2.0
-recent_files = ['RunExps.py', 'RunExp.py', 'ReadParams.py']
+recent_files = ['RunExps.py', 'SelObs.py', 'ReadParams.py', 'ProcessPrior.py', 'RunExp.py']
 
