@@ -14,6 +14,7 @@ from MetropolisCalculations import MetropolisCalculations
 from CalculateEstimates import CalculateEstimates
 from MakeFigs import MakeFigs
 from CalcErrorStats import CalcErrorStats
+from FilterEstimate import FilterEstimate
 
 def RunExp(RunDir,ShowFigs,Laterals,ReCalc):
     
@@ -89,9 +90,10 @@ def RunExp(RunDir,ShowFigs,Laterals,ReCalc):
             jmp = pickle.load(input)
     
     [Estimate,Chain]=CalculateEstimates(Chain,D,Obs,Prior,DAll,AllObs,Exp.nOpt)
-    
+    [Estimate] = FilterEstimate(Estimate,Chain,D,Obs)
     #%%
     Err=CalcErrorStats(AllTruth,Estimate,DAll)
+    Err=DispRMSEStats(Err,Truth,Prior,Estimate);
     
     if ShowFigs:
         MakeFigs(D,Truth,Prior,Chain,Estimate,Err,AllTruth,DAll,AllObs)
