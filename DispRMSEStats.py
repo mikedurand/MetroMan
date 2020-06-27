@@ -1,4 +1,6 @@
-def DispRMSEStats(Err,Truth,Prior,E):
+from numpy import mean,disp,sqrt
+
+def DispRMSEStats(Err,Truth,Prior,E):  
 
     #Quick Error stats
     Err.RelErrA0=mean(E.A0hat.T-Truth.A0)/mean(Truth.A0)
@@ -7,9 +9,9 @@ def DispRMSEStats(Err,Truth,Prior,E):
     disp(['Relative Uncertainty in A0: ' +str(mean(E.stdA0Post.T/E.A0hat.T))])
 
 
-    RMSQPost=sqrt(mean( (E.QhatPostf.T-Truth.Q.T)**2 ),0)
-    RMSQPrior=sqrt(mean( (E.QhatPrior.T-Truth.Q.T)**2 ),0)
-    ratio=((RMSQPrior-RMSQPost)/RMSQPrior)*100
+    RMSQPost=sqrt(mean( (E.QhatPostf.T-Truth.Q.T)**2,0 ))
+    RMSQPrior=sqrt(mean( (E.QhatPrior.T-Truth.Q.T)**2,0 ))
+    # ratio=((RMSQPrior-RMSQPost)/RMSQPrior)*100
 
     nR=len(E.A0hat)
 
@@ -36,4 +38,4 @@ def DispRMSEStats(Err,Truth,Prior,E):
     print('For entire timeseries, RMSE/Qbart=%.2f' %RMSEQbart, \
           'and bias/Qbart=%.2f' %biasQbart)   
 
-    return
+    return Err

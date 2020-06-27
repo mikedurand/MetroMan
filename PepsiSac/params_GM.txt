@@ -4,7 +4,7 @@ Burn in
 2000
 Random Number Seed
 9
-Number of times to use in estimate
+Initial and final time (first and last days) to use in estimate 
 10 40
 Prior mean on mean discharge [m3/s]
 377

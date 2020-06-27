@@ -6,7 +6,7 @@ Created on Fri Jun 12 16:21:06 2020
 @author: mtd
 """
 
-from numpy import mean,sqrt
+from numpy import mean,sqrt,log,std
 from MetroManVariables import ErrorStats
 
 def CalcErrorStats(AllTruth,E,DAll):
