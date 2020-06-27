@@ -8,7 +8,7 @@ infile=fid.readlines()
 
 ShowFigs=True
 Laterals=False
-ReCalc=False #setting to False will load the existing .pkl run data and plot
+ReCalc=True #setting to False will load the existing .pkl run data and plot
 
 
 for i in range(0,len(infile)):
