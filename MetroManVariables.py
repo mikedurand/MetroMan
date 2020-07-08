@@ -106,6 +106,9 @@ class Truth:
         self.q=[] #lateral inflow [m^2/s]
         self.n=[] #friction coefficient []
         self.Q=empty( (D.nR,D.nt)  ) #discharge [m^3/s]
+        self.dA=empty( (D.nR,D.nt)  ) #cross-sectional area change [m^3/s]
+        self.W=empty( (D.nR,D.nt)  ) #width [m]
+        self.h=empty( (D.nR,D.nt)  ) #wse [m]
 
 class Jump:
     def __init__(self):
