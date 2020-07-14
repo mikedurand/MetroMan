@@ -79,21 +79,8 @@ def CalculateEstimates(C,D,Obs,Prior,DAll,AllObs,nOpt):
     #4.1) uncertainty estimate of the dA term
     Obs.sigdAv=sqrt(diag(Obs.CdA))
     Obs.sigdA=Obs.sigdAv.reshape(D.nt,D.nR).T
-    #4.2) uncertainty (variance) of the Manning terms
-    E.QhatUnc_na=(E.stdnaPost/Prior.meanna)**2
-    E.QhatUnc_x1=(log(Obs.w/(E.A0hat.reshape(D.nR,1)@ones([1,D.nt])+Obs.dA)) * \
-                    (E.stdx1Post.reshape(D.nR,1)@ones([1,D.nt])))**2;
-
-    E.QhatUnc_w=(2/3*Obs.sigw/Obs.w)**2
-    E.QhatUnc_S=(1/2*Obs.sigS/Obs.S)**2
-    E.QhatUnc_A0=((5/3-Prior.meanx1.reshape(D.nR,1)@ones([1,D.nt])) * \
-                 (E.stdA0Post.reshape(D.nR,1)@ones([1,D.nt])) / \
-                 (E.A0hat.reshape(D.nR,1)@ones([1,D.nt])+Obs.dA))**2
-    E.QhatUnc_dA=((5/3-Prior.meanx1.reshape(D.nR,1)@ones([1,D.nt])) * \
-                 Obs.sigdA / \
-                 (E.A0hat.reshape(D.nR,1)@ones([1,D.nt])+Obs.dA))**2
     
-    #4.3) estimate correlation coefficient between A0 & na, A0 & x1, na & x1
+    #4.2) estimate correlation coefficient between A0 & na, A0 & x1, na & x1
     E.rho_A0na=empty([D.nR,1])
     E.rho_A0na[:]=NaN
     E.rho_A0x1=empty([D.nR,1])
@@ -107,29 +94,56 @@ def CalculateEstimates(C,D,Obs,Prior,DAll,AllObs,nOpt):
         E.rho_A0x1[i,0]=R_A0x1[0,1]
         R_nax1=corrcoef(C.thetana[i,:], C.thetax1[i,:])
         E.rho_nax1[i,0]=R_nax1[0,1]
-
-    #4.4) estimate uncertainty of Manning's Q
-    #4.4.1) estimate uncertainty in Q due to cross-correlation of A0 & na, na & x1, x1 & A0
-    E.QhatUnc_A0na=-2*(E.rho_A0na.reshape(D.nR,1)@ones([1,D.nt])) * \
-                      (5/3-Prior.meanx1.reshape(D.nR,1)@ones([1,D.nt])) * \
-                      (E.stdnaPost.reshape(D.nR,1)@ones([1,D.nt])) * \
-                      (E.stdA0Post.reshape(D.nR,1)@ones([1,D.nt])) / \
-                      (Prior.meanna.reshape(D.nR,1)@ones([1,D.nt])) / \
-                      (E.A0hat.reshape(D.nR,1)@ones([1,D.nt])+Obs.dA)
-              
-    E.QhatUnc_nax1=-2*(E.rho_nax1.reshape(D.nR,1)@ones([1,D.nt])) * \
-                      (E.stdx1Post.reshape(D.nR,1)@ones([1,D.nt])) * \
-                      (E.stdnaPost.reshape(D.nR,1)@ones([1,D.nt])) * \
-                      log(Obs.w/(E.A0hat.reshape(D.nR,1)@ones([1,D.nt])+Obs.dA)) / \
-                      (Prior.meanna.reshape(D.nR,1)@ones([1,D.nt]))
-                  
-    E.QhatUnc_A0x1=2*(E.rho_A0x1.reshape(D.nR,1)@ones([1,D.nt])) * \
-                      (E.stdA0Post.reshape(D.nR,1)@ones([1,D.nt])) * \
-                      (E.stdx1Post.reshape(D.nR,1)@ones([1,D.nt])) * \
-                      (5/3-Prior.meanx1.reshape(D.nR,1)@ones([1,D.nt])) * \
-                      log(Obs.w/(E.A0hat.reshape(D.nR,1)@ones([1,D.nt])+Obs.dA)) / \
-                      (E.A0hat.reshape(D.nR,1)@ones([1,D.nt])+Obs.dA)
+        
+    #4.3) uncertainty (variance) of the Manning terms
+    E.QhatUnc_w=(2/3*Obs.sigw/Obs.w)**2
+    E.QhatUnc_S=(1/2*Obs.sigS/Obs.S)**2
+    E.QhatUnc_na=(E.stdnaPost/Prior.meanna)**2
     
+    A=(E.A0hat.reshape(D.nR,1)@ones([1,D.nt])+Obs.dA)
+    sigx1=E.stdx1Post.reshape(D.nR,1)@ones([1,D.nt])
+    sigA0=E.stdA0Post.reshape(D.nR,1)@ones([1,D.nt])
+    signa=E.stdnaPost.reshape(D.nR,1)@ones([1,D.nt])
+    rhoA0x1=E.rho_A0x1.reshape(D.nR,1)@ones([1,D.nt])
+    rhonax1=E.rho_nax1.reshape(D.nR,1)@ones([1,D.nt])
+    rhoA0na=E.rho_A0na.reshape(D.nR,1)@ones([1,D.nt])
+    sigdA=Obs.sigdA
+    na=Prior.meanna.reshape(D.nR,1)@ones([1,D.nt])
+    x1=Prior.meanx1.reshape(D.nR,1)@ones([1,D.nt])
+    
+    if nOpt==3:
+        E.QhatUnc_x1=[]
+        E.QhatUnc_A0=[]
+        E.QhatUnc_dA=[]
+        
+        E.QhatUnc_A0na=[]
+        E.QhatUnc_nax1=[]
+        E.QhatUnc_A0x1=[]
+        
+    elif nOpt==4:
+        E.QhatUnc_x1=(log(Obs.w/A) *sigx1)**2;
+        E.QhatUnc_A0=((5/3-x1) * sigA0/A)**2
+        E.QhatUnc_dA=((5/3-x1) * sigdA/A)**2
+    
+        #4.4) estimate uncertainty of Manning's Q
+        #4.4.1) estimate uncertainty in Q due to cross-correlation of A0 & na, na & x1, x1 & A0
+        E.QhatUnc_A0na=-2*rhoA0na*((5/3-x1)/na/A)*signa*sigA0        
+        E.QhatUnc_nax1=-2*rhonax1*(log(Obs.w/A)/na)*sigx1*signa             
+        E.QhatUnc_A0x1=2*rhoA0x1*((5/3-x1)*log(Obs.w/A)/A)*sigA0*sigx1
+    
+    elif nOpt==5:
+        # this is based on Rodriguez et al. WRR 2020 and assumes a log-normal distribution of river depth
+        cd=x1*(A/Obs.w)
+        
+        E.QhatUnc_x1=(5/3*cd*Obs.w/A * (1+cd**2)**-1)**2 * sigx1**2
+        E.QhatUnc_A0=(5/3/A*((1+cd**-2)**-1+1))**2 * sigA0**2
+        E.QhatUnc_dA=(5/3/A*((1+cd**-2)**-1+1))**2 * sigdA**2
+        
+        E.QhatUnc_A0na=-2*rhoA0na*(5/3/A/na*((1+cd**-2)**-1 +1))*signa*sigA0
+        E.QhatUnc_nax1=2*rhonax1*(5/3/na*cd*Obs.w/A * (1+cd**2)**-1)*signa*sigx1
+        E.QhatUnc_A0x1=-2*rhoA0x1*(5/3/A*((1+cd**-2)**-1+1))*(5/3*cd*Obs.w/A * (1+cd**2)**-1)*sigA0*sigx1
+        
+        
     #4.4.2) estimate total Q uncertinty
     E.QhatUnc_Hat=sqrt( E.QhatUnc_na+mean(E.QhatUnc_x1,1)+mean(E.QhatUnc_w,1)+ \
                         mean(E.QhatUnc_A0,1)+mean(E.QhatUnc_dA,1)+mean(E.QhatUnc_S,1)+ \
