@@ -30,12 +30,13 @@ def FilterEstimate(Estimate,C,D,Obs):
     xplus=empty([D.nR*D.nt,C.N]); xplus[:]=NaN
     for i in range(0,C.N):
         xminus[:,i]=Qchain[:,i]    
-        xplus[:,i]=xplus[:,i]=xminus[:,i] + (K@(y-H@xminus[:,i].reshape([D.nR*D.nt,1]))).reshape(D.nR*D.nt)
+        xplus[:,i]=xminus[:,i] + (K@(y-H@xminus[:,i].reshape([D.nR*D.nt,1]))).reshape(D.nR*D.nt)
     
 
     Qhatfv=mean(xplus[:,C.Nburn-1:C.N-1],1)
-    Estimate.QhatPostf=Qhatfv.reshape([D.nt,D.nR]).T
+    # Estimate.QhatPostf=Qhatfv.reshape([D.nt,D.nR]).T
+    Estimate.QhatPostf=Qhatfv.reshape([D.nR,D.nt])    
     Ppostv=diag( (eye(D.nt*D.nR)-K@H)@P )
-    Estimate.QhatPostfUnc=sqrt(Ppostv).reshape([D.nt,D.nR]).T
-
+    # Estimate.QhatPostfUnc=sqrt(Ppostv).reshape([D.nt,D.nR]).T
+    Estimate.QhatPostfUnc=sqrt(Ppostv).reshape([D.nR,D.nt])
     return Estimate
