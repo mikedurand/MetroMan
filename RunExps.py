@@ -8,10 +8,10 @@ infile=fid.readlines()
 
 ShowFigs=True
 Laterals=False
-ReCalc=False #setting to False will load the existing .pkl run data and plot
-
+ReCalc=True #setting to False will load the existing .pkl run data and plot
+DebugMode=True
 
 for i in range(0,len(infile)):
     RunDir=infile[i].replace('\n','')
-    RunExp(RunDir,ShowFigs,Laterals,ReCalc)
+    RunExp(RunDir,ShowFigs,Laterals,ReCalc,DebugMode)
         

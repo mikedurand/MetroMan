@@ -9,7 +9,7 @@ from logninvstat import logninvstat
 from calcnhat import calcnhat
 from MetroManVariables import Jump
 
-def ProcessPrior(Prior,AllObs,DAll,Obs,D,ShowFigs,E):
+def ProcessPrior(Prior,AllObs,DAll,Obs,D,ShowFigs,E,DebugMode):
     #%% 1 handle input prior information
     #% note that A0min is refined for inclusion in the "jmp" variable at the bottom
     allA0min=empty((DAll.nR,1))
@@ -58,6 +58,10 @@ def ProcessPrior(Prior,AllObs,DAll,Obs,D,ShowFigs,E):
     
     #%%  chain setup
     N=int(1e4) 
+    
+    if DebugMode:
+        N=int(1e3)
+    
     Nburn=int(N*.2)
         
     for r in range(0,D.nR):

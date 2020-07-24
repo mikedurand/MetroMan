@@ -17,7 +17,7 @@ from CalcErrorStats import CalcErrorStats
 from FilterEstimate import FilterEstimate
 from DispRMSEStats import DispRMSEStats
 
-def RunExp(RunDir,ShowFigs,Laterals,ReCalc):
+def RunExp(RunDir,ShowFigs,Laterals,ReCalc,DebugMode):
     
     if ReCalc:
         
@@ -48,7 +48,7 @@ def RunExp(RunDir,ShowFigs,Laterals,ReCalc):
         Obs=CalcdA(D,Obs)
         AllObs=CalcdA(DAll,AllObs)
         
-        [Prior,jmp]=ProcessPrior(Prior,AllObs,DAll,Obs,D,ShowFigs,Exp)
+        [Prior,jmp]=ProcessPrior(Prior,AllObs,DAll,Obs,D,ShowFigs,Exp,DebugMode)
         
         [Obs,Prior]=GetCovMats(D,Obs,Prior)
         
@@ -56,7 +56,7 @@ def RunExp(RunDir,ShowFigs,Laterals,ReCalc):
         AllObs.S[AllObs.S<0]=putmask(AllObs.S,AllObs.S<0,0)
         
         #%%
-        Chain=MetropolisCalculations(Prior,D,Obs,jmp,Chain,R,DAll,AllObs,Exp.nOpt)
+        Chain=MetropolisCalculations(Prior,D,Obs,jmp,Chain,R,DAll,AllObs,Exp.nOpt,DebugMode)
         
         #%%
         filename=RunDir+ '/RunData.pkl'

@@ -34,9 +34,7 @@ def FilterEstimate(Estimate,C,D,Obs):
     
 
     Qhatfv=mean(xplus[:,C.Nburn-1:C.N-1],1)
-    # Estimate.QhatPostf=Qhatfv.reshape([D.nt,D.nR]).T
     Estimate.QhatPostf=Qhatfv.reshape([D.nR,D.nt])    
     Ppostv=diag( (eye(D.nt*D.nR)-K@H)@P )
-    # Estimate.QhatPostfUnc=sqrt(Ppostv).reshape([D.nt,D.nR]).T
     Estimate.QhatPostfUnc=sqrt(Ppostv).reshape([D.nR,D.nt])
     return Estimate

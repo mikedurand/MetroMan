@@ -16,8 +16,12 @@ from logninvstat import logninvstat
 from CalcLklhd import CalcLklhd
 
 
-def MetropolisCalculations(Prior,D,Obs,jmp,C,R,DAll,AllObs,nOpt):
+def MetropolisCalculations(Prior,D,Obs,jmp,C,R,DAll,AllObs,nOpt,DebugMode):
     [Delta,DeltaA,B,C,thetauA0,thetauna,thetaux1,thetauq,R]=InitializeMetropolis(D,C,Prior,R)
+    
+    if DebugMode:
+        C.N=int(C.N/10)
+        C.Nburn=int(C.Nburn/10)        
     
     jmp.stdA0=0.1*mean(thetauA0)
     jmp.stdna=0.01*mean(thetauna)
