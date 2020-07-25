@@ -78,7 +78,7 @@ def CalculateEstimates(C,D,Obs,Prior,DAll,AllObs,nOpt):
     #4) discharge error budget: all done for Q(nr x nt)  
     #4.1) uncertainty estimate of the dA term
     Obs.sigdAv=sqrt(diag(Obs.CdA))
-    Obs.sigdA=Obs.sigdAv.reshape(D.nt,D.nR).T
+    Obs.sigdA=Obs.sigdAv.reshape(D.nR,D.nt)
     
     #4.2) estimate correlation coefficient between A0 & na, A0 & x1, na & x1
     E.rho_A0na=empty([D.nR,1])
