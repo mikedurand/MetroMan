@@ -25,19 +25,19 @@ def CalcDelta(nr,nt,L):
                 Delta[Row,Col1:Col2+1]=-c/2
                 Delta[Row,Col3:Col4+1]=b/2
             elif r==(nr-1):
-                Col1=nt+t1
-                Col2=nt+t2
-                Col3=2*nt+t1
-                Col4=2*nt+t2
+                Col1=t1+nt*(r-1)
+                Col2=t2+nt*(r-1)
+                Col3=t1+nt*(r)
+                Col4=t2+nt*(r)
                 Delta[Row,Col1:Col2+1]=-a/2
                 Delta[Row,Col3:Col4+1]=-c/2
             else:
-                Col1=t1
-                Col2=t2
-                Col3=nt+t1
-                Col4=nt+t2
-                Col5=2*nt+t1
-                Col6=2*nt+t2
+                Col1=t1+nt*(r-1)
+                Col2=t2+nt*(r-1)
+                Col3=t1+nt*(r)
+                Col4=t2+nt*(r)
+                Col5=t1+nt*(r+1)
+                Col6=t2+nt*(r+1)
                 Delta[Row,Col1:Col2+1]=-a/2
                 Delta[Row,Col3:Col4+1]=-c/2
                 Delta[Row,Col5:Col6+1]=b/2
