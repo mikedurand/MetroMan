@@ -17,9 +17,9 @@ def ReadTruth(fname,D):
     
     for i in range(0,D.nR):
         buf=infile[i+7]; buf=buf.split(); Tru.Q[i,:]=array(buf,float) 
-        buf_dA=infile[i+7+10]; buf_dA=buf_dA.split(); Tru.dA[i,:]=array(buf_dA,float)
-        buf_h=infile[i+7+10+10]; buf_h=buf_h.split(); Tru.h[i,:]=array(buf_h,float)
-        buf_W=infile[i+7+10+10+10]; buf_W=buf_W.split(); Tru.W[i,:]=array(buf_W,float)
+        buf_dA=infile[i+8+D.nR]; buf_dA=buf_dA.split(); Tru.dA[i,:]=array(buf_dA,float)
+        buf_h=infile[i+9+2*D.nR]; buf_h=buf_h.split(); Tru.h[i,:]=array(buf_h,float)
+        buf_W=infile[i+10+3*D.nR]; buf_W=buf_W.split(); Tru.W[i,:]=array(buf_W,float)
         
     
     fid.close()
