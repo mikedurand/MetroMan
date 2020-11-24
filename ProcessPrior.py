@@ -2,14 +2,14 @@
 # -*- coding: utf-8 -*-
 
 from numpy import empty,ones,zeros,mean,std,median,exp,maximum
-from numpy.random import randn,rand
+from numpy.random import randn,rand,seed
 from scipy.stats import lognorm
 import time
 from logninvstat import logninvstat
 from calcnhat import calcnhat
 from MetroManVariables import Jump
 
-def ProcessPrior(Prior,AllObs,DAll,Obs,D,ShowFigs,E,DebugMode):
+def ProcessPrior(Prior,AllObs,DAll,Obs,D,ShowFigs,E,R,DebugMode):
     #%% 1 handle input prior information
     #% note that A0min is refined for inclusion in the "jmp" variable at the bottom
     allA0min=empty((DAll.nR,1))
@@ -70,6 +70,8 @@ def ProcessPrior(Prior,AllObs,DAll,Obs,D,ShowFigs,E,DebugMode):
             
     nau=meanna
     x1u=meanx1
+    
+    seed([R.Seed])
     
     z1=randn(DAll.nR,N)
     z2=randn(DAll.nR,N)

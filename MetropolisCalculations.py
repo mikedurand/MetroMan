@@ -142,8 +142,8 @@ def MetropolisCalculations(Prior,D,Obs,jmp,C,R,DAll,AllObs,nOpt,DebugMode):
     return C
 
 def InitializeMetropolis(D,C,P,R):
-    
     from numpy.random import seed,rand,randn
+    
     
     Delta=CalcDelta(D.nR,D.nt,D.L)
     DeltaA=CalcADelta(D.nR,D.nt)

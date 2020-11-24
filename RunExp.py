@@ -48,7 +48,7 @@ def RunExp(RunDir,ShowFigs,Laterals,ReCalc,DebugMode):
         Obs=CalcdA(D,Obs)
         AllObs=CalcdA(DAll,AllObs)
         
-        [Prior,jmp]=ProcessPrior(Prior,AllObs,DAll,Obs,D,ShowFigs,Exp,DebugMode)
+        [Prior,jmp]=ProcessPrior(Prior,AllObs,DAll,Obs,D,ShowFigs,Exp,R,DebugMode)
         
         [Obs,Prior]=GetCovMats(D,Obs,Prior)
         
