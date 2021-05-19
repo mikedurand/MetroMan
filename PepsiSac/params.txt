@@ -12,3 +12,5 @@ Prior coefficient of variation on mean flow [fraction... set to 0.5 for typical 
 0.5	
 n version to use 
 4 
+Model error (nRMSE)
+0.01

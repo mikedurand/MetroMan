@@ -1,4 +1,4 @@
-from numpy import reshape,empty,ones,any,concatenate,isinf
+from numpy import reshape,empty,ones,any,concatenate,isinf,eye
 from numpy.linalg import inv,cond
 #from ManningCalcs import *
 # from ChannelMassBal import *
@@ -49,8 +49,10 @@ def CalcLklhd(Obs,AllObs,A0,na,x1,D,Prior,Delta,DeltaA,B,qhatv,nOpt):
     
     J=concatenate((JS,JdA,Jw),axis=1 )
     CdQ=J @ Obs.CSdAw @ J.T
+    
+    CdQm= Delta @ eye(M) * (Prior.meanQbar * Prior.eQm)**2 @ Delta.T
 
-    Cf=Obs.CA + CdQ + Prior.Cqf #+CdQm
+    Cf=Obs.CA + CdQ + Prior.Cqf +CdQm
     
     Theta=dQdxv+dAdtv-Prior.Lats.qv
     

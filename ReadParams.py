@@ -23,10 +23,11 @@ def ReadParams(fname,D):
     P.covQbar=eval(infile[11])
     
     Exp.nOpt=eval(infile[13])
-    #Exp.tStep=eval(infile[15])
+
+    P.eQm=eval(infile[15])
     
-    if len(infile)>14:
-        buf=infile[15]; buf=buf.split();
+    if len(infile)>16:
+        buf=infile[17]; buf=buf.split();
         P.Geomorph.Use=True
         P.Geomorph.loga_hat=eval(buf[0])
         P.Geomorph.loga_sigma=eval(buf[1])

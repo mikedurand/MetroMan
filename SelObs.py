@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from numpy import reshape,diff,ones,empty,arange
+from numpy import reshape,diff,ones,empty,arange,size
 from MetroManVariables import Observations,Domain,Truth
 
 def SelObs(DAll,Obs,Exp,AllTruth,AllLats): 
@@ -46,21 +46,23 @@ def SelObs(DAll,Obs,Exp,AllTruth,AllLats):
     Obs.sigh=AllObs.sigh
     Obs.sigw=AllObs.sigw
     Obs.sigS=AllObs.sigS
-       
-    #%%select truth
-    Tru=Truth(D)
-    Tru.A0=AllTruth.A0
-    Tru.n=AllTruth.n
-    Tru.q=AllTruth.q
-    for i in range(0,DAll.nR):
-        Tru.Q[i,:]=AllTruth.Q[i,Exp.iEst]    
     
+    if size(AllTruth)>0:     
+        #%%select truth
+        Tru=Truth(D)
+        Tru.A0=AllTruth.A0
+        Tru.n=AllTruth.n
+        Tru.q=AllTruth.q
+        for i in range(0,DAll.nR):
+            Tru.Q[i,:]=AllTruth.Q[i,Exp.iEst]    
+    else:
+        Tru=[]
+        
     #%%select lateral inflows    
     q=empty( (D.nR,D.nt-1) )
     for i in range(0,DAll.nR):
         q[i,:]=AllLats.q[i,Exp.iEst[0:-1] ]    
- 
-    
+     
     
     return D,Obs,AllObs,DAll,Tru,q
     
