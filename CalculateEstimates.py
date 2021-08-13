@@ -98,7 +98,7 @@ def CalculateEstimates(C,D,Obs,Prior,DAll,AllObs,nOpt):
     #4.3) uncertainty (variance) of the Manning terms
     # E.QhatUnc_w=(2/3*Obs.sigw/Obs.w)**2
     E.QhatUnc_S=(1/2*Obs.sigS/Obs.S)**2
-    E.QhatUnc_na=(E.stdnaPost/Prior.meanna)**2
+    E.QhatUnc_na=(E.stdnaPost/E.nahat)**2
     
     A=(E.A0hat.reshape(D.nR,1)@ones([1,D.nt])+Obs.dA)
     sigx1=E.stdx1Post.reshape(D.nR,1)@ones([1,D.nt])
@@ -108,8 +108,8 @@ def CalculateEstimates(C,D,Obs,Prior,DAll,AllObs,nOpt):
     rhonax1=E.rho_nax1.reshape(D.nR,1)@ones([1,D.nt])
     rhoA0na=E.rho_A0na.reshape(D.nR,1)@ones([1,D.nt])
     sigdA=Obs.sigdA
-    na=Prior.meanna.reshape(D.nR,1)@ones([1,D.nt])
-    x1=Prior.meanx1.reshape(D.nR,1)@ones([1,D.nt])
+    na=E.nahat.reshape(D.nR,1)@ones([1,D.nt])
+    x1=E.x1hat.reshape(D.nR,1)@ones([1,D.nt])
     
     if nOpt==3:
         E.QhatUnc_w=[]
@@ -147,12 +147,12 @@ def CalculateEstimates(C,D,Obs,Prior,DAll,AllObs,nOpt):
         E.QhatUnc_A0x1=-2*rhoA0x1*(5/3/A*((1+cd**-2)**-1+1))*(5/3*cd*Obs.w/A * (1+cd**2)**-1)*sigA0*sigx1
         
         
-    #4.4.2) estimate total Q uncertinty
+    #4.4.2) estimate total Q uncertainty
     E.QhatUnc_Hat=sqrt( E.QhatUnc_na+mean(E.QhatUnc_x1,1)+mean(E.QhatUnc_w,1)+ \
                         mean(E.QhatUnc_A0,1)+mean(E.QhatUnc_dA,1)+mean(E.QhatUnc_S,1)+ \
                         mean(E.QhatUnc_A0na,1)+mean(E.QhatUnc_nax1,1)+mean(E.QhatUnc_A0x1,1))
     
-    #4.4.2) estimate total Q uncertinty wrt time
+    #4.4.2) estimate total Q uncertainty wrt time
     E.QhatUnc_HatAll=sqrt( E.QhatUnc_na.reshape(D.nR,1)@ones([1,D.nt])+E.QhatUnc_x1+E.QhatUnc_w+ \
                            E.QhatUnc_A0+E.QhatUnc_dA+E.QhatUnc_S+ \
                            E.QhatUnc_A0na+E.QhatUnc_nax1+E.QhatUnc_A0x1)
