@@ -78,7 +78,7 @@ def CalculateEstimates(C,D,Obs,Prior,DAll,AllObs,nOpt):
     #4) discharge error budget: all done for Q(nr x nt)  
     #4.1) uncertainty estimate of the dA term
     Obs.sigdAv=sqrt(diag(Obs.CdA))
-    Obs.sigdA=Obs.sigdAv.reshape(D.nt,D.nR).T
+    Obs.sigdA=Obs.sigdAv.reshape(D.nR,D.nt)
     
     #4.2) estimate correlation coefficient between A0 & na, A0 & x1, na & x1
     E.rho_A0na=empty([D.nR,1])
@@ -96,7 +96,7 @@ def CalculateEstimates(C,D,Obs,Prior,DAll,AllObs,nOpt):
         E.rho_nax1[i,0]=R_nax1[0,1]
         
     #4.3) uncertainty (variance) of the Manning terms
-    E.QhatUnc_w=(2/3*Obs.sigw/Obs.w)**2
+    # E.QhatUnc_w=(2/3*Obs.sigw/Obs.w)**2
     E.QhatUnc_S=(1/2*Obs.sigS/Obs.S)**2
     E.QhatUnc_na=(E.stdnaPost/Prior.meanna)**2
     
@@ -112,6 +112,7 @@ def CalculateEstimates(C,D,Obs,Prior,DAll,AllObs,nOpt):
     x1=Prior.meanx1.reshape(D.nR,1)@ones([1,D.nt])
     
     if nOpt==3:
+        E.QhatUnc_w=[]
         E.QhatUnc_x1=[]
         E.QhatUnc_A0=[]
         E.QhatUnc_dA=[]
@@ -121,6 +122,7 @@ def CalculateEstimates(C,D,Obs,Prior,DAll,AllObs,nOpt):
         E.QhatUnc_A0x1=[]
         
     elif nOpt==4:
+        E.QhatUnc_w=(((x1-2/3)/Obs.w) * Obs.sigw)**2
         E.QhatUnc_x1=(log(Obs.w/A) *sigx1)**2;
         E.QhatUnc_A0=((5/3-x1) * sigA0/A)**2
         E.QhatUnc_dA=((5/3-x1) * sigdA/A)**2
@@ -135,6 +137,7 @@ def CalculateEstimates(C,D,Obs,Prior,DAll,AllObs,nOpt):
         # this is based on Rodriguez et al. WRR 2020 and assumes a log-normal distribution of river depth
         cd=x1*(A/Obs.w)
         
+        E.QhatUnc_w=( (5*x1**2*Obs.w)/(3*A**2 * ((x1*Obs.w/A)**2 + 1)) - 1/(3*Obs.w) )**2 * Obs.sigw**2
         E.QhatUnc_x1=(5/3*cd*Obs.w/A * (1+cd**2)**-1)**2 * sigx1**2
         E.QhatUnc_A0=(5/3/A*((1+cd**-2)**-1+1))**2 * sigA0**2
         E.QhatUnc_dA=(5/3/A*((1+cd**-2)**-1+1))**2 * sigdA**2
